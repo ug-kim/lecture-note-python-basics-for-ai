@@ -9,7 +9,9 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 from config import Config
-from network import Model
+from network import Model  # network에 있는 모델 불러온다
+# 코딩 하다보면 코드 잘 나누는게 중요
+# 모듈화 중요
 
 SEED = 42
 torch.manual_seed(SEED)
@@ -35,6 +37,7 @@ def get_config():
 
 # MNIST dataset
 def get_mnist(BATCH_SIZE: int):
+    # iterator 형태로 데이터 가져온다
     mnist_train = datasets.MNIST(
         root="./data/", train=True, transform=transforms.ToTensor(), download=True
     )
@@ -42,6 +45,7 @@ def get_mnist(BATCH_SIZE: int):
         root="./data/", train=False, transform=transforms.ToTensor(), download=True
     )
 
+    # data loader
     train_iter = torch.utils.data.DataLoader(
         mnist_train, batch_size=BATCH_SIZE, shuffle=True, num_workers=1
     )
@@ -54,7 +58,7 @@ def get_mnist(BATCH_SIZE: int):
 
 # Defining Model
 def get_network(LEARNING_RATE: float, device: str):
-    network = Model().to(device)
+    network = Model().to(device)  # model 불러옴
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(network.parameters(), lr=LEARNING_RATE)
 
@@ -156,10 +160,12 @@ if __name__ == "__main__":
     print("Preparing dataset done!")
 
     network, criterion, optimizer = get_network(config.LEARNING_RATE, config.device)
-    print_modelinfo(network)
+    print_modelinfo(network)  # print 역할 따로 만들어둠
 
+    # 학습
     train_model(
         network, train_iter, test_iter, config.EPOCHS, config.BATCH_SIZE, config.device
     )
 
+    # 성능 보여줌
     test_model(network, test_iter, config.device)
